@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}{{ item.title }}{% endblock %}
+{% block content %}
+<article class="slip big {{ item.status }}">
+  <span class="stamp">{{ 'ว่าง' if item.status == 'available' else 'ถูกยืมอยู่' }}</span>
+  <span class="cat">{{ item.category }}</span>
+  <h1>{{ item.title }}</h1>
+  <p class="desc">{{ item.description or 'ไม่มีรายละเอียดเพิ่มเติม' }}</p>
+  <span class="owner">เจ้าของ: {{ item.owner_name }}</span>
+</article>
+
+{% if not g.user %}
+  <p class="hint"><a href="{{ url_for('login', next=request.path) }}">เข้าสู่ระบบ</a> เพื่อขอยืมของชิ้นนี้</p>
+{% elif item.owner_id == g.user.id %}
+  <div class="row">
+    <a class="btn" href="{{ url_for('item_edit', item_id=item.id) }}">แก้ไข</a>
+  </div>
+{% elif item.status != 'available' %}
+  <p class="hint">ตอนนี้มีคนยืมอยู่ กลับมาดูใหม่เมื่อเจ้าของบันทึกว่าคืนแล้ว</p>
+{% else %}
+<section class="card narrow">
+  <h2>ขอยืมของชิ้นนี้</h2>
+  <form method="post" action="{{ url_for('borrow', item_id=item.id) }}" novalidate>
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <div class="row two">
+      <label>วันที่ยืม
+        <input type="date" name="borrow_date" min="{{ today }}" value="{{ form.get('borrow_date', today) }}" required></label>
+      <label>วันที่คืน
+        <input type="date" name="return_date" min="{{ today }}" value="{{ form.get('return_date', '') }}" required></label>
+    </div>
+    <label>ข้อความถึงเจ้าของ <small>(ไม่บังคับ ไม่เกิน 300 ตัว)</small>
+      <textarea name="message" rows="3" maxlength="300">{{ form.get('message', '') }}</textarea></label>
+    <button class="btn" type="submit">ส่งคำขอยืม</button>
+  </form>
+</section>
+{% endif %}
+{% endblock %}

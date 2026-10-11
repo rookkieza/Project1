@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}เข้าสู่ระบบ{% endblock %}
+{% block content %}
+<section class="card narrow">
+  <h1>เข้าสู่ระบบ</h1>
+  <form method="post" novalidate>
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <label>ชื่อผู้ใช้
+      <input name="username" value="{{ username or '' }}" required maxlength="20" autocomplete="username"></label>
+    <label>รหัสผ่าน
+      <input type="password" name="password" required maxlength="128" autocomplete="current-password"></label>
+    <button class="btn" type="submit">เข้าสู่ระบบ</button>
+  </form>
+  <p class="hint">ยังไม่มีบัญชี? <a href="{{ url_for('register') }}">สมัครสมาชิก</a></p>
+</section>
+{% endblock %}

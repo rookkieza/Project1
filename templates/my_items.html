@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}ของของฉัน{% endblock %}
+{% block content %}
+<div class="row between"><h1>ของของฉัน</h1><a class="btn" href="{{ url_for('item_new') }}">เพิ่มของ</a></div>
+
+<h2>คำขอยืมที่เข้ามา</h2>
+{% if incoming %}
+<div class="list">
+  {% for r in incoming %}
+  <div class="line">
+    <div>
+      <strong>{{ r.borrower_name }}</strong> ขอยืม <strong>{{ r.title }}</strong><br>
+      <small>{{ r.borrow_date }} ถึง {{ r.return_date }}{% if r.message %} · “{{ r.message }}”{% endif %}</small>
+    </div>
+    <div class="row">
+      <span class="tag {{ r.status }}">{{ STATUS_TH[r.status] }}</span>
+      {% if r.status == 'pending' %}
+        <form method="post" action="{{ url_for('request_action', req_id=r.id, action='approve') }}" class="inline">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="btn small" type="submit">อนุมัติ</button></form>
+        <form method="post" action="{{ url_for('request_action', req_id=r.id, action='reject') }}" class="inline">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="btn small ghost" type="submit">ปฏิเสธ</button></form>
+      {% else %}
+        <form method="post" action="{{ url_for('request_action', req_id=r.id, action='returned') }}" class="inline">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="btn small" type="submit">คืนแล้ว</button></form>
+      {% endif %}
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% else %}<p class="hint">ยังไม่มีคำขอที่รอดำเนินการ</p>{% endif %}
+
+<h2>รายการที่ฉันลง</h2>
+{% if items %}
+<div class="list">
+  {% for i in items %}
+  <div class="line">
+    <div><a href="{{ url_for('item_detail', item_id=i.id) }}"><strong>{{ i.title }}</strong></a><br><small>{{ i.category }}</small></div>
+    <div class="row">
+      <span class="tag {{ i.status }}">{{ 'ว่าง' if i.status == 'available' else 'ถูกยืมอยู่' }}</span>
+      <a class="btn small ghost" href="{{ url_for('item_edit', item_id=i.id) }}">แก้ไข</a>
+      <form method="post" action="{{ url_for('item_delete', item_id=i.id) }}" class="inline" data-confirm="ลบ “{{ i.title }}” ใช่ไหม?">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="btn small danger" type="submit">ลบ</button></form>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<div class="empty"><p>คุณยังไม่ได้ลงของ</p><a class="btn" href="{{ url_for('item_new') }}">เพิ่มของชิ้นแรก</a></div>
+{% endif %}
+<script src="{{ url_for('static', filename='confirm.js') }}"></script>
+{% endblock %}

@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}สมัครสมาชิก{% endblock %}
+{% block content %}
+<section class="card narrow">
+  <h1>สมัครสมาชิก</h1>
+  <form method="post" novalidate>
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <label>ชื่อผู้ใช้ <small>(อังกฤษ/ตัวเลข/_ 3-20 ตัว)</small>
+      <input name="username" value="{{ username or '' }}" required minlength="3" maxlength="20" autocomplete="username"></label>
+    <label>ชื่อที่แสดง
+      <input name="display_name" value="{{ display_name or '' }}" required maxlength="40"></label>
+    <label>รหัสผ่าน <small>(อย่างน้อย 8 ตัว)</small>
+      <input type="password" name="password" required minlength="8" maxlength="128" autocomplete="new-password"></label>
+    <label>ยืนยันรหัสผ่าน
+      <input type="password" name="password2" required minlength="8" maxlength="128" autocomplete="new-password"></label>
+    <button class="btn" type="submit">สมัครสมาชิก</button>
+  </form>
+  <p class="hint">มีบัญชีแล้ว? <a href="{{ url_for('login') }}">เข้าสู่ระบบ</a></p>
+</section>
+{% endblock %}

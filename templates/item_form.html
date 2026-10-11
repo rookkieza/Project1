@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}{{ 'เพิ่มของ' if mode == 'new' else 'แก้ไขของ' }}{% endblock %}
+{% block content %}
+<section class="card narrow">
+  <h1>{{ 'เพิ่มของที่ให้ยืม' if mode == 'new' else 'แก้ไขของที่ให้ยืม' }}</h1>
+  <form method="post" novalidate>
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <label>ชื่อของ
+      <input name="title" value="{{ item.title or '' }}" required maxlength="80"></label>
+    <label>หมวดหมู่
+      <select name="category">
+        {% for c in CATEGORIES %}<option value="{{ c }}" {{ 'selected' if c == item.category }}>{{ c }}</option>{% endfor %}
+      </select></label>
+    <label>รายละเอียด <small>(สภาพ จำนวนเล่ม เงื่อนไขการยืม ไม่เกิน 500 ตัว)</small>
+      <textarea name="description" rows="5" maxlength="500">{{ item.description or '' }}</textarea></label>
+    <div class="row">
+      <button class="btn" type="submit">{{ 'เพิ่มของ' if mode == 'new' else 'บันทึกการแก้ไข' }}</button>
+      <a class="btn ghost" href="{{ url_for('my_items') }}">ยกเลิก</a>
+    </div>
+  </form>
+</section>
+{% endblock %}

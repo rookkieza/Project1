@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}คำขอที่ฉันส่ง{% endblock %}
+{% block content %}
+<h1>คำขอที่ฉันส่ง</h1>
+{% if requests %}
+<div class="list">
+  {% for r in requests %}
+  <div class="line">
+    <div>
+      <a href="{{ url_for('item_detail', item_id=r.item_id) }}"><strong>{{ r.title }}</strong></a> · เจ้าของ {{ r.owner_name }}<br>
+      <small>{{ r.borrow_date }} ถึง {{ r.return_date }}</small>
+    </div>
+    <div class="row">
+      <span class="tag {{ r.status }}">{{ STATUS_TH[r.status] }}</span>
+      {% if r.status == 'pending' %}
+      <form method="post" action="{{ url_for('request_action', req_id=r.id, action='cancel') }}" class="inline">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="btn small ghost" type="submit">ยกเลิกคำขอ</button></form>
+      {% endif %}
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<div class="empty"><p>ยังไม่เคยส่งคำขอยืม</p><a class="btn" href="{{ url_for('index') }}">ดูของที่ให้ยืม</a></div>
+{% endif %}
+{% endblock %}

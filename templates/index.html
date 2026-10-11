@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}ของที่ให้ยืม{% endblock %}
+{% block content %}
+<section class="hero">
+  <h1>ใครมีอะไรให้ยืมบ้าง</h1>
+  <p>ของในหอที่เพื่อนยินดีให้ยืม กดขอยืมแล้วรอเจ้าของตอบ</p>
+</section>
+<form class="search" method="get" action="{{ url_for('index') }}">
+  <input type="search" name="q" value="{{ q }}" placeholder="ค้นหาชื่อของ เช่น Catan, ชีทแคลคูลัส" maxlength="50" aria-label="ค้นหา">
+  <select name="cat" aria-label="หมวดหมู่">
+    <option value="">ทุกหมวด</option>
+    {% for c in CATEGORIES %}<option value="{{ c }}" {{ 'selected' if c == cat }}>{{ c }}</option>{% endfor %}
+  </select>
+  <button class="btn" type="submit">ค้นหา</button>
+</form>
+{% if items %}
+<div class="grid">
+  {% for i in items %}
+  <a class="slip {{ i.status }}" href="{{ url_for('item_detail', item_id=i.id) }}">
+    <span class="stamp">{{ 'ว่าง' if i.status == 'available' else 'ถูกยืมอยู่' }}</span>
+    <span class="cat">{{ i.category }}</span>
+    <h3>{{ i.title }}</h3>
+    <p>{{ i.description[:90] }}{{ '…' if i.description|length > 90 }}</p>
+    <span class="owner">เจ้าของ: {{ i.owner_name }}</span>
+  </a>
+  {% endfor %}
+</div>
+{% else %}
+<div class="empty">
+  <p>ยังไม่พบรายการ{{ 'ที่ตรงกับคำค้น' if q or cat }}</p>
+  {% if g.user %}<a class="btn" href="{{ url_for('item_new') }}">ลงของของคุณเป็นคนแรก</a>
+  {% else %}<a class="btn" href="{{ url_for('register') }}">สมัครสมาชิกเพื่อลงของ</a>{% endif %}
+</div>
+{% endif %}
+{% endblock %}

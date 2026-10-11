@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}จัดการระบบ{% endblock %}
+{% block content %}
+<h1>จัดการระบบ</h1>
+<h2>ผู้ใช้ทั้งหมด ({{ users|length }})</h2>
+<div class="tablewrap">
+<table>
+  <thead><tr><th>ชื่อผู้ใช้</th><th>ชื่อที่แสดง</th><th>บทบาท</th><th>จำนวนของ</th><th>สถานะ</th><th></th></tr></thead>
+  <tbody>
+  {% for u in users %}
+  <tr>
+    <td>{{ u.username }}</td><td>{{ u.display_name }}</td><td>{{ u.role }}</td><td>{{ u.item_count }}</td>
+    <td>{{ 'ถูกระงับ' if u.is_banned else 'ปกติ' }}</td>
+    <td>{% if u.role != 'admin' %}
+      <form method="post" action="{{ url_for('admin_ban', user_id=u.id) }}" class="inline">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button class="btn small {{ 'ghost' if u.is_banned else 'danger' }}" type="submit">{{ 'ปลดระงับ' if u.is_banned else 'ระงับ' }}</button>
+      </form>{% endif %}</td>
+  </tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+<h2>รายการของทั้งหมด ({{ items|length }})</h2>
+<div class="tablewrap">
+<table>
+  <thead><tr><th>ชื่อของ</th><th>หมวด</th><th>เจ้าของ</th><th>สถานะ</th><th></th></tr></thead>
+  <tbody>
+  {% for i in items %}
+  <tr>
+    <td><a href="{{ url_for('item_detail', item_id=i.id) }}">{{ i.title }}</a></td><td>{{ i.category }}</td><td>{{ i.owner_name }}</td>
+    <td>{{ 'ว่าง' if i.status == 'available' else 'ถูกยืมอยู่' }}</td>
+    <td><form method="post" action="{{ url_for('item_delete', item_id=i.id) }}" class="inline" data-confirm="ลบ “{{ i.title }}” ใช่ไหม?">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="btn small danger" type="submit">ลบ</button></form></td>
+  </tr>
+  {% else %}<tr><td colspan="5">ยังไม่มีรายการ</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+<script src="{{ url_for('static', filename='confirm.js') }}"></script>
+{% endblock %}
